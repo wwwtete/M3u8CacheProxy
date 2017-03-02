@@ -11,7 +11,6 @@ import com.wangw.m3u8cahceproxy.CacheProxyCallback;
 import com.wangw.m3u8cahceproxy.CacheProxyException;
 import com.wangw.m3u8cahceproxy.CacheProxyManager;
 import com.wangw.m3u8cahceproxy.cache.Extinfo;
-import com.wangw.m3u8cahceproxy.proxy.dep.M3u8Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements CacheProxyCallbac
 
     public void onFileSequence(View v){
         String path3 = Environment.getExternalStorageDirectory().getAbsolutePath() + "/AAA/fileSequence/fileSequence.m3u8";
-        String mVideoSource = String.format("http://127.0.0.1:%d%s", M3u8Server.PORT, path3);
 //        mPlayer.setUp(mVideoSource,false);
 //        mVideoView.setVideoPath(mVideoSource);
 //        mPlayer.setUp("http://127.0.0.1:2341/fileSequence/fileSequence.m3u8",false);
