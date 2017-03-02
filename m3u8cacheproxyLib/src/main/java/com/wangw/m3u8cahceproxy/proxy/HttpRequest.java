@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLException;
 
@@ -30,6 +32,7 @@ import static com.wangw.m3u8cahceproxy.CacheUtils.decodePercent;
  */
 
 public class HttpRequest {
+    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("[R,r]ange:[ ]?bytes=(\\d*)-");
     private final BufferedInputStream inputStream;
     private final String remoteIp;
     private final String remoteHostname;
@@ -40,6 +43,8 @@ public class HttpRequest {
     private String protocolVersion;
     private boolean keepAlive;
     private String queryParameterString;
+    private long rangeOffset;
+    private boolean partial;
 
     public HttpRequest(InputStream inputStream, InetAddress inetAddress) {
         this.inputStream = new BufferedInputStream(inputStream);
@@ -170,12 +175,11 @@ public class HttpRequest {
 
     private void decodeHeader(BufferedReader in, Map<String, String> pre, Map<String, String> parms, Map<String, String> headers) throws CacheProxyException {
         try {
-            // Read the request line
             String inLine = in.readLine();
             if (inLine == null) {
                 return;
             }
-
+            findRangeOffset(inLine);
             StringTokenizer st = new StringTokenizer(inLine);
             if (!st.hasMoreTokens()) {
                 throw new CacheProxyException("错误的请求，语法错误，正确格式: GET /example/file.html");
@@ -189,7 +193,6 @@ public class HttpRequest {
 
             String uri = st.nextToken();
 
-            // Decode parameters from the URI
             int qmi = uri.indexOf('?');
             if (qmi >= 0) {
                 decodeParms(uri.substring(qmi + 1), parms);
@@ -198,10 +201,6 @@ public class HttpRequest {
                 uri = decodePercent(uri);
             }
 
-            // If there's another token, its protocol version,
-            // followed by HTTP headers.
-            // NOTE: this now forces header names lower case since they are
-            // case insensitive and vary by client.
             if (st.hasMoreTokens()) {
                 protocolVersion = st.nextToken();
             } else {
@@ -219,6 +218,14 @@ public class HttpRequest {
             pre.put("uri", uri);
         } catch (IOException ioe) {
             throw new CacheProxyException( "解析Header异常: IOException: " + ioe.getMessage(), ioe);
+        }
+    }
+
+    private void findRangeOffset(String request) {
+        Matcher matcher = RANGE_HEADER_PATTERN.matcher(request);
+        if (matcher.find()) {
+            String rangeValue = matcher.group(1);
+            rangeOffset = Long.parseLong(rangeValue);
         }
     }
 
@@ -260,5 +267,19 @@ public class HttpRequest {
 
     public Method requestMethod() {
         return method;
+    }
+
+    public String getQueryParameterString() {
+        return queryParameterString;
+    }
+
+    public HashMap<String, String> getParms() {
+        return parms;
+    }
+
+    public String getParm(String key){
+        if (parms != null)
+            return parms.get(key);
+        return null;
     }
 }

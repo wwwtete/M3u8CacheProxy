@@ -2,6 +2,8 @@ package com.wangw.m3u8cahceproxy;
 
 import android.util.Log;
 
+import java.io.IOException;
+
 /**
  * Created by wangw on 2017/3/1.
  */
@@ -23,4 +25,8 @@ public class L {
         Log.e(TAG,e.getMessage());
     }
 
+    public static void e(String s, IOException e) {
+        Log.e(TAG,s);
+        e.printStackTrace();
+    }
 }

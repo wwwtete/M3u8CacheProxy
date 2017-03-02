@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 
 public class CacheProxyManager implements TsListDownLoadCallback {
 
+    public static final String KEY_SERVER = "server";
     private static final int STATE_FAILED = -1;
     private static final int STATE_ALLOWPLAY = 1;
 

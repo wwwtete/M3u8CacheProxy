@@ -10,10 +10,18 @@ import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 import com.wangw.m3u8cahceproxy.CacheProxyCallback;
 import com.wangw.m3u8cahceproxy.CacheProxyException;
 import com.wangw.m3u8cahceproxy.CacheProxyManager;
+import com.wangw.m3u8cahceproxy.FileUtils;
 import com.wangw.m3u8cahceproxy.cache.Extinfo;
+import com.wangw.m3u8cahceproxy.cache.M3u8Help;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 
 public class MainActivity extends AppCompatActivity implements CacheProxyCallback {
 
@@ -53,13 +61,78 @@ public class MainActivity extends AppCompatActivity implements CacheProxyCallbac
     public void onTest(View v){
 //        mPlayer.setUp("http://127.0.0.1:2341/test/test.m3u8",false);
 //                mPlayer.setUp("http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8",false);
-        mPlayer.setUp("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8",false);
-        mPlayer.startPlayLogic();
+//        mPlayer.setUp("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8",false);
+//        mPlayer.startPlayLogic();
 //        mPlayer.setUp("http://127.0.0.1:2341/test/test.m3u8",false);
 //        File file = new File( Environment.getExternalStorageDirectory().getAbsolutePath(),"AAA");
 //        mVideoView.setVideoPath("http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8");
 //        mVideoView.start();
+        try {
+            CountDownLatch latch = new CountDownLatch(1);
+            initData("test4/fileSequence.m3u8",latch);
+            latch.await();
+            onplay("http://127.0.0.1:2341/test4/fileSequence.m3u8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    private void initData(final String patch, final CountDownLatch latch) throws IOException {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String filePatch = Environment.getExternalStorageDirectory().getAbsolutePath() + "/AAA/"+patch;
+                    File file = new File(filePatch);
+                    if (file.exists()){
+                        file.delete();
+                    }else {
+                        File parent = file.getParentFile();
+                        FileUtils.makeDir(parent);
+                    }
+                    String name = file.getName();
+                    name = name.substring(0,name.lastIndexOf("."));
+                    M3u8Help help = new M3u8Help(file);
+                    int i;
+                    for (i = 0; i < 20; i++) {
+                        Extinfo extinfo = new Extinfo();
+                        extinfo.duration = 10;
+                        extinfo.url= "http://devimages.apple.com/iphone/samples/bipbop/gear1/fileSequence"+i+".ts";
+                        extinfo.fileName = String.format(Locale.US, "%s?%s=%s", name+"_"+i+".ts",CacheProxyManager.KEY_SERVER, encode(extinfo.url));
+                        help.insert(extinfo);
+                    }
+                    help.endlist();
+                    latch.countDown();
+//                    Thread.sleep(1000*22);
+//                    while (i < 50){
+//                        i++;
+//                        Extinfo extinfo = new Extinfo();
+//                        extinfo.duration = 10;
+//                        extinfo.url= "http://devimages.apple.com/iphone/samples/bipbop/gear1/fileSequence"+i+".ts";
+//                        extinfo.fileName = String.format(Locale.US, "%s?%s=%s", name+"_"+i+".ts",CacheProxyManager.KEY_SERVER, encode(extinfo.url));
+//                        help.insert(extinfo);
+//                        Thread.sleep(1000*20);
+//                    }
+                    help.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    static String encode(String url) {
+        try {
+            return URLEncoder.encode(url, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Error encoding url", e);
+        }
+    }
+
+    private void onplay(String url){
+        mPlayer.setUp(url,false);
+        mPlayer.startPlayLogic();
     }
 
     private void demo() {

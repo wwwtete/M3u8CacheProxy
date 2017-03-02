@@ -13,13 +13,12 @@ import java.io.RandomAccessFile;
 public class M3u8Help {
 
 
-    private final String mName;
+//    private final String mName;
     private File mFile;
     private RandomAccessFile mDataFile;
 
-    public M3u8Help(File m3u8File,String name) throws IOException {
+    public M3u8Help(File m3u8File) throws IOException {
         mFile = CacheUtils.checkNotNull(m3u8File,"m3u8 File对象 不能为空");
-        mName = name;
         onInit();
     }
 
@@ -53,6 +52,11 @@ public class M3u8Help {
         String extInfoStr = String.format("#EXTINF:%d,\n%s\n",extinfo.duration,extinfo.fileName);
         mDataFile.seek(mDataFile.length());
         mDataFile.write(extInfoStr.toString().getBytes());
+    }
+
+    public void endlist() throws IOException {
+        mDataFile.seek(mDataFile.length());
+        mDataFile.write("#EXT-X-ENDLIST".getBytes());
     }
 
 

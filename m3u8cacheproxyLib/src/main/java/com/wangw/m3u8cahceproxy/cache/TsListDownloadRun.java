@@ -102,7 +102,7 @@ public class TsListDownloadRun extends BaseDownload implements Runnable {
     private boolean initM3u8Help(File cacheDir) throws IOException {
         File m3u8File = new File(cacheDir.getAbsolutePath(),mName+".m3u8");
         boolean exists = m3u8File.exists();
-        mM3u8Help = new M3u8Help(m3u8File,mName);
+        mM3u8Help = new M3u8Help(m3u8File);
         return !exists;
     }
 

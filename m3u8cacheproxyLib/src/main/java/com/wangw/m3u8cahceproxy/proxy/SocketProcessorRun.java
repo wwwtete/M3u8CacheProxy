@@ -4,6 +4,7 @@ import android.os.Build;
 
 import com.wangw.m3u8cahceproxy.Config;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -44,6 +45,12 @@ public class SocketProcessorRun implements Runnable {
             close(inputStream);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 close(mSocket);
+            }else {
+                try {
+                    mSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             stop();
         }

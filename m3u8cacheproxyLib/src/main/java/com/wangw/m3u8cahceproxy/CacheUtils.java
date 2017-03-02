@@ -63,4 +63,15 @@ public class CacheUtils {
         return decoded;
     }
 
+    public static void assertBuffer(byte[] buffer, long offset, int length) {
+        checkNotNull(buffer, "Buffer must be not null!");
+        checkArgument(offset >= 0, "Data offset must be positive!");
+        checkArgument(length >= 0 && length <= buffer.length, "Length must be in range [0..buffer.length]");
+    }
+
+    static void checkArgument(boolean expression, String errorMessage) {
+        if (!expression) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
 }

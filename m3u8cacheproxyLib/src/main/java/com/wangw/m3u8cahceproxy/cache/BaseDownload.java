@@ -2,6 +2,7 @@ package com.wangw.m3u8cahceproxy.cache;
 
 import com.wangw.m3u8cahceproxy.CacheProxyException;
 import com.wangw.m3u8cahceproxy.CacheUtils;
+import com.wangw.m3u8cahceproxy.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

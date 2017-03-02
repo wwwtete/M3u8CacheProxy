@@ -1,8 +1,6 @@
-package com.wangw.m3u8cahceproxy.cache;
+package com.wangw.m3u8cahceproxy;
 
 import android.text.TextUtils;
-
-import com.wangw.m3u8cahceproxy.CacheUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -60,6 +58,19 @@ public class FileUtils {
         ops.flush();
         CacheUtils.close(ips);
         CacheUtils.close(ops);
+    }
+
+   public static void makeDir(File directory) throws IOException {
+        if (directory.exists()) {
+            if (!directory.isDirectory()) {
+                throw new IOException("File " + directory + " is not directory!");
+            }
+        } else {
+            boolean isCreated = directory.mkdirs();
+            if (!isCreated) {
+                throw new IOException(String.format("Directory %s can't be created", directory.getAbsolutePath()));
+            }
+        }
     }
 
 }
