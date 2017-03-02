@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/videopathget" 
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="#ffffffff" >
+	
+    <LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_centerVertical="true"
+	    android:orientation="vertical">
+	    
+	    <Button
+	        android:id="@+id/play_url_m3u8"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="10dip"
+	        android:gravity="center"
+	        android:text="播放网络m3u8" />
+	    
+	    <Button
+	        android:id="@+id/play_location_m3u8"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="10dip"
+	        android:gravity="center"
+	        android:text="播放本地m3u8" />
+
+		<Button
+			android:id="@+id/customplayer"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dip"
+			android:gravity="center"
+			android:text="定制播放器" />
+     </LinearLayout>
+
+</RelativeLayout>
