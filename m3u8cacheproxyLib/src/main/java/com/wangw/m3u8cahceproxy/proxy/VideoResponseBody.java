@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.wangw.m3u8cahceproxy.CacheProxyManager.KEY_SERVER;
 import static com.wangw.m3u8cahceproxy.CacheUtils.DEFAULT_BUFFER_SIZE;
+import static com.wangw.m3u8cahceproxy.PlayProxyServer.KEY_SERVER;
 
 /**
  * Created by wangw on 2017/3/2.

@@ -7,27 +7,23 @@ import android.view.View;
 import android.widget.VideoView;
 
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
-import com.wangw.m3u8cahceproxy.CacheProxyCallback;
-import com.wangw.m3u8cahceproxy.CacheProxyException;
-import com.wangw.m3u8cahceproxy.CacheProxyManager;
 import com.wangw.m3u8cahceproxy.FileUtils;
-import com.wangw.m3u8cahceproxy.cache.Extinfo;
-import com.wangw.m3u8cahceproxy.cache.M3u8Help;
+import com.wangw.m3u8cahceproxy.PlayProxyServer;
+import com.wangw.m3u8cahceproxy.source.Extinfo;
+import com.wangw.m3u8cahceproxy.source.M3u8Help;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
-public class MainActivity extends AppCompatActivity implements CacheProxyCallback {
+public class MainActivity extends AppCompatActivity {
 
     private StandardGSYVideoPlayer mPlayer;
     private VideoView mVideoView;
-    private CacheProxyManager mProxyManager;
+//    private CacheProxyManager mProxyManager;
+    private PlayProxyServer mProxyServer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,8 +34,9 @@ public class MainActivity extends AppCompatActivity implements CacheProxyCallbac
 
 //        M3u8Server.execute();
 //        mPlayer.setUp("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8",false);
-        mProxyManager = App.instance.getCacheProxy();
-        mProxyManager.addCallback(this);
+//        mProxyManager = App.instance.getCacheProxy();
+//        mProxyManager.addCallback(this);
+        mProxyServer = App.instance.getProxyServer();
 
     }
 
@@ -95,14 +92,14 @@ public class MainActivity extends AppCompatActivity implements CacheProxyCallbac
                     name = name.substring(0,name.lastIndexOf("."));
                     M3u8Help help = new M3u8Help(file);
                     int i;
-                    for (i = 0; i < 20; i++) {
+                    for (i = 0; i < 2; i++) {
                         Extinfo extinfo = new Extinfo();
                         extinfo.duration = 10;
                         extinfo.url= "http://devimages.apple.com/iphone/samples/bipbop/gear1/fileSequence"+i+".ts";
-                        extinfo.fileName = String.format(Locale.US, "%s?%s=%s", name+"_"+i+".ts",CacheProxyManager.KEY_SERVER, encode(extinfo.url));
+                        extinfo.fileName = mProxyServer.getProxyUrl(name+"_"+i+".ts",extinfo.url);
                         help.insert(extinfo);
                     }
-                    help.endlist();
+//                    help.endlist();
                     latch.countDown();
 //                    Thread.sleep(1000*22);
 //                    while (i < 50){
@@ -122,14 +119,6 @@ public class MainActivity extends AppCompatActivity implements CacheProxyCallbac
         }).start();
     }
 
-    static String encode(String url) {
-        try {
-            return URLEncoder.encode(url, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Error encoding url", e);
-        }
-    }
-
     private void onplay(String url){
         mPlayer.setUp(url,false);
         mPlayer.startPlayLogic();
@@ -143,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements CacheProxyCallbac
             extinfo.url="http://devimages.apple.com/iphone/samples/bipbop/gear1/fileSequence"+i+".ts";
             list.add(extinfo);
         }
-        mProxyManager.start(list,"test2");
+//        mProxyManager.start(list,"test2");
     }
 
     @Override
@@ -158,17 +147,17 @@ public class MainActivity extends AppCompatActivity implements CacheProxyCallbac
         mPlayer.onVideoPause();
     }
 
-    @Override
-    public void onStartPlay(String name,String url) {
-        mPlayer.setUp(url,false);
-        mPlayer.startPlayLogic();
+//    @Override
+//    public void onStartPlay(String name,String url) {
+//        mPlayer.setUp(url,false);
+//        mPlayer.startPlayLogic();
+//
+//        mVideoView.setVideoPath(url);
+//        mVideoView.start();
+//    }
 
-        mVideoView.setVideoPath(url);
-        mVideoView.start();
-    }
-
-    @Override
-    public void onError(String name,CacheProxyException e) {
-        e.printStackTrace();
-    }
+//    @Override
+//    public void onError(String name,CacheProxyException e) {
+//        e.printStackTrace();
+//    }
 }

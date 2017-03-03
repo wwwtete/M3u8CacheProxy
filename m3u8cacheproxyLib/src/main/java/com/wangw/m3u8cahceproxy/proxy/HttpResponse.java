@@ -126,7 +126,13 @@ public class HttpResponse {
 
     private void responseWithCache(OutputStream out, long offset) throws CacheProxyException, IOException {
         VideoResponseBody response =new VideoResponseBody(mRequest,mCacheRoot);
-        response.send(out, (int) offset);
+        try {
+            response.send(out, (int) offset);
+        }catch (Exception e){
+            throw e;
+        }finally {
+            response.shutdown();
+        }
     }
 
     private void responseWithoutCache(OutputStream out, long offset) throws CacheProxyException, IOException {
