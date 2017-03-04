@@ -1,5 +1,7 @@
 package com.wangw.m3u8cahceproxy.proxy;
 
+import android.text.TextUtils;
+
 import com.wangw.m3u8cahceproxy.CacheProxyException;
 import com.wangw.m3u8cahceproxy.CacheUtils;
 import com.wangw.m3u8cahceproxy.L;
@@ -26,13 +28,14 @@ public class VideoResponseBody {
     private static final int MAX_READ_SOURCE_ATTEMPTS = 1;
 
     private HttpRequest mRequest;
-    private final Source source;
+    private Source source;
     private final Cache cache;
     private final Object wc = new Object();
     private final Object stopLock = new Object();
     private final AtomicInteger readSourceErrorsCount;
     private volatile Thread sourceReaderThread;
     private volatile boolean stopped;
+    private boolean mHasServer;
 //    private volatile int percentsAvailable = -1;
 
     public VideoResponseBody(HttpRequest request, File cacheRoot) throws CacheProxyException {
@@ -41,9 +44,11 @@ public class VideoResponseBody {
 //        fileName = fileName.substring(fileName.lastIndexOf("/")+1,fileName.length());
         String server = mRequest.getParm(KEY_SERVER);
 //        String url = "http://devimages.apple.com/iphone/samples/bipbop/gear1/"+fileName;
-        SourceInfo info = new SourceInfo(server,Integer.MIN_VALUE,mRequest.getMimeType());
-
-        this.source = new HttpUrlSource(info);
+        mHasServer = !TextUtils.isEmpty(server);
+        if (mHasServer) {
+            SourceInfo info = new SourceInfo(server, Integer.MIN_VALUE, mRequest.getMimeType());
+            this.source = new HttpUrlSource(info);
+        }
         File file = new File(cacheRoot.getAbsolutePath(),mRequest.getUri());
         this.cache = new FileCache(file);
         this.readSourceErrorsCount = new AtomicInteger();
@@ -52,7 +57,7 @@ public class VideoResponseBody {
     public int read(byte[] buffer, long offset, int length) throws CacheProxyException {
         CacheUtils.assertBuffer(buffer, offset, length);
 
-        while (!cache.isCompleted() && cache.available() < (offset + length) && !stopped) {
+        while (mHasServer && !cache.isCompleted() && cache.available() < (offset + length) && !stopped) {
             readSourceAsync();
             waitForSourceData();
             checkReadSourceErrorsCount();
@@ -75,7 +80,6 @@ public class VideoResponseBody {
 
     public void shutdown() {
         synchronized (stopLock) {
-            L.log("Shutdown proxy for " + source);
             try {
                 stopped = true;
                 if (sourceReaderThread != null) {
@@ -165,7 +169,7 @@ public class VideoResponseBody {
 
     private void tryComplete() throws CacheProxyException {
         synchronized (stopLock) {
-            if (!isStopped() && cache.available() == source.length()) {
+            if (source != null && !isStopped() && cache.available() == source.length()) {
                 cache.complete();
             }
         }
@@ -177,7 +181,8 @@ public class VideoResponseBody {
 
     private void closeSource() {
         try {
-            source.close();
+            if (source != null)
+                source.close();
         } catch (CacheProxyException e) {
             onError(new CacheProxyException("Error closing source " + source, e));
         }
