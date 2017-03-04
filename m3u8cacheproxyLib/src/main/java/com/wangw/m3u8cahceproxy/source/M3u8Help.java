@@ -33,7 +33,7 @@ public class M3u8Help {
     }
 
     private String getHeader(){
-        return "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-MEDIA-SEQUENCE:0\n#EXT-X-TARGETDURATION:10\n";
+        return "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-MEDIA-SEQUENCE:0\n#EXT-X-ALLOW-CACHE:YES\n#EXT-X-TARGETDURATION:5\n";
     }
 
     public void insert(Extinfo extinfo) throws IOException {
@@ -50,6 +50,7 @@ public class M3u8Help {
 //                .append(extinfo.fileName)
 //                .append("\n");
         String extInfoStr = String.format("#EXTINF:%d,\n%s\n",extinfo.duration,extinfo.fileName);
+//        String extInfoStr = String.format("%s\n",extinfo.fileName);
         mDataFile.seek(mDataFile.length());
         mDataFile.write(extInfoStr.toString().getBytes());
     }

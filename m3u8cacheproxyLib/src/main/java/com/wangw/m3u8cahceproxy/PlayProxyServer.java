@@ -108,11 +108,13 @@ public class PlayProxyServer {
         private File mCacheRoot;
         private String mHost;
         private int mProt;
+        private int mTimeOut;
 
         public Builder(Context context) {
             mCacheRoot = context.getCacheDir();
             mHost = "127.0.0.1";
             mProt = 2341;
+            mTimeOut = 1000*20;
         }
 
         public Builder setCacheRoot(File cacheRoot) {
@@ -125,12 +127,17 @@ public class PlayProxyServer {
             return this;
         }
 
+        public Builder setTimeOut(int timeOut) {
+            mTimeOut = timeOut;
+            return this;
+        }
+
         public PlayProxyServer build() throws CacheProxyException {
             return new PlayProxyServer(buildConfig());
         }
 
         public Config buildConfig() {
-            return new Config(mCacheRoot,mHost,mProt);
+            return new Config(mCacheRoot,mHost,mProt,mTimeOut);
         }
 
 

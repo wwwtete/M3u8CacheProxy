@@ -1,7 +1,5 @@
 package com.wangw.m3u8cahceproxy.proxy;
 
-import android.os.Build;
-
 import com.wangw.m3u8cahceproxy.Config;
 
 import java.io.IOException;
@@ -33,31 +31,29 @@ public class SocketProcessorRun implements Runnable {
             outputStream = mSocket.getOutputStream();
             inputStream = mSocket.getInputStream();
             HttpRequest request = new HttpRequest(inputStream,mSocket.getInetAddress());
-            while (!mSocket.isClosed()){
+            //TODO 暂时只处理一次请求，读完后关闭socket
+//            while (!mSocket.isClosed()){
                 request.parseRequest();
                 HttpResponse response = new HttpResponse(request,mConfig.getCacheRoot());
                 response.send(outputStream);
-            }
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
             close(outputStream);
             close(inputStream);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                close(mSocket);
-            }else {
-                try {
-                    mSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
             stop();
         }
 
     }
 
     public void stop() {
+       try {
+           if (!mSocket.isClosed())
+               mSocket.close();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
 
     }
 }

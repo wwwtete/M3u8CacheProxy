@@ -66,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
 //        mVideoView.start();
         try {
             CountDownLatch latch = new CountDownLatch(1);
-            initData("test4/fileSequence.m3u8",latch);
+            initData("test5/test5.m3u8",latch);
             latch.await();
-            onplay("http://127.0.0.1:2341/test4/fileSequence.m3u8");
+            onplay("http://127.0.0.1:2341/test5/test5.m3u8");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -92,14 +92,14 @@ public class MainActivity extends AppCompatActivity {
                     name = name.substring(0,name.lastIndexOf("."));
                     M3u8Help help = new M3u8Help(file);
                     int i;
-                    for (i = 0; i < 2; i++) {
+                    for (i = 1; i < 6; i++) {
                         Extinfo extinfo = new Extinfo();
                         extinfo.duration = 10;
                         extinfo.url= "http://devimages.apple.com/iphone/samples/bipbop/gear1/fileSequence"+i+".ts";
                         extinfo.fileName = mProxyServer.getProxyUrl(name+"_"+i+".ts",extinfo.url);
                         help.insert(extinfo);
                     }
-//                    help.endlist();
+                    help.endlist();
                     latch.countDown();
 //                    Thread.sleep(1000*22);
 //                    while (i < 50){
@@ -122,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
     private void onplay(String url){
         mPlayer.setUp(url,false);
         mPlayer.startPlayLogic();
+
+        mVideoView.setVideoPath(url);
+        mVideoView.start();
     }
 
     private void demo() {

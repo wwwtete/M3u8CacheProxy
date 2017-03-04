@@ -61,6 +61,7 @@ public class HttpRequest {
         int read = -1;
         this.inputStream.mark(DEFAULT_BUFFER_SIZE);
         try {
+            //read 如果没有读到数据则会阻塞住
             read = this.inputStream.read(buf, 0, DEFAULT_BUFFER_SIZE);
         } catch (SSLException e) {
             throw e;

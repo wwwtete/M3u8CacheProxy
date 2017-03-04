@@ -13,10 +13,11 @@ public class Config {
     private int mPort;
     private int mTimeOut = 5000;
 
-    public Config(File cacheRoot, String host, int port) {
+    public Config(File cacheRoot, String host, int port,int timeOut) {
         mCacheRoot = cacheRoot;
         mHost = host;
         mPort = port;
+        this.mTimeOut = timeOut;
     }
 
     public int getTimeOut() {
